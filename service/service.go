@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"math/big"
 	"strconv"
@@ -10,9 +11,8 @@ import (
 
 func (s *FaucetService) Start() {
 	s.fetchAccounts()
-	log.Println(s.Accounts)
 
-	ticker := time.NewTicker(15 * time.Second)
+	ticker := time.NewTicker(15 * time.Minute)
 	go func() {
 		for {
 			select {
@@ -23,6 +23,7 @@ func (s *FaucetService) Start() {
 	}()
 
 	go s.listenForAccounts()
+	log.Info("Starting faucet service")
 	s.faucetService()
 
 }
@@ -51,23 +52,23 @@ func (s *FaucetService) checkAccount(walletAddress string) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"status": "checkAccount",
-			"block":  string(lastTime),
+			"time":  string(lastTime),
 		}).Warn("Could not convert time to int")
+		db.Write([]byte("accounts"), []byte(walletAddress), []byte("0"))
 	}
 
 	if time.Since(time.Unix(int64(dbTime), 0)) > time.Hour * 24 {
 		bal := s.Balance(walletAddress)
-		log.Println(bal)
 		if bal.Cmp(big.NewInt(1e18)) < 0 {
 			log.WithFields(log.Fields{
 				"address": walletAddress,
 			}).Info("balance under threshold, preparing to send PFN")
 			s.Send(walletAddress)
-			//db.Write([]byte("accounts"), []byte(walletAddress), []byte(time.Now().String()))
+			db.Write([]byte("accounts"), []byte(walletAddress), []byte(fmt.Sprintf("%v", time.Now().Unix())))
 		} else {
-			log.WithFields(log.Fields{
-				"address": walletAddress,
-			}).Info("balance over threshold, skipping for now")
+			//log.WithFields(log.Fields{
+			//	"address": walletAddress,
+			//}).Info("balance over threshold")
 		}
 	}
 

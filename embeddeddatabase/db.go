@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"github.com/boltdb/bolt"
 	log "github.com/sirupsen/logrus"
 )
@@ -38,7 +39,7 @@ func Read(bucket []byte, key []byte) ([]byte, error) {
 		b := tx.Bucket(bucket)
 		if b == nil {
 			log.Error("embeddeddatabase/db.go:Balance(): Failed open bucket")
-			return nil
+			return errors.New("failed to open bucket")
 		}
 		ret = b.Get(key)
 		return nil
