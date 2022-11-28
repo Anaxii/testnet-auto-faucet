@@ -5,6 +5,6 @@ WORKDIR /go/src/app
 
 COPY . .
 
-RUN go mod tidy
+RUN go mod tidy -compat=1.17
 
 CMD go run ./main
