@@ -3,14 +3,15 @@ module testnet-autofaucet
 go 1.17
 
 require (
+	github.com/boltdb/bolt v1.3.1
 	github.com/ethereum/go-ethereum v1.10.26
 	github.com/sirupsen/logrus v1.9.0
+	go.mongodb.org/mongo-driver v1.11.0
 	golang.org/x/crypto v0.3.0
 )
 
 require (
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
-	github.com/boltdb/bolt v1.3.1 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0 // indirect
 	github.com/deckarep/golang-set v1.8.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
@@ -28,7 +29,6 @@ require (
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
-	go.mongodb.org/mongo-driver v1.11.0 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect

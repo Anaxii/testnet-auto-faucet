@@ -35,7 +35,7 @@ func (s *FaucetService) faucetService() {
 				s.checkAccount(k)
 			}
 		}
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 15)
 	}
 }
 
@@ -62,7 +62,8 @@ func (s *FaucetService) checkAccount(walletAddress string) {
 			log.WithFields(log.Fields{
 				"address": walletAddress,
 			}).Info("balance under threshold, preparing to send PFN")
-			//embeddeddatabase.Write([]byte("accounts"), []byte(walletAddress), []byte(time.Now().String()))
+			s.Send(walletAddress)
+			//db.Write([]byte("accounts"), []byte(walletAddress), []byte(time.Now().String()))
 		} else {
 			log.WithFields(log.Fields{
 				"address": walletAddress,
