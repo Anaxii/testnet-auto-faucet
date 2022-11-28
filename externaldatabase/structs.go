@@ -2,7 +2,6 @@ package externaldatabase
 
 type VerificationRequest struct {
 	Name            string          `json:"name" bson:"name"`
-	ID              string          `json:"id" bson:"id"`
 	Status          string          `json:"status" bson:"status"`
 	Email           string          `json:"email" bson:"email"`
 	WalletAddress   string          `json:"wallet_address" bson:"wallet_address"`
