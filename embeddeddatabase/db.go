@@ -6,7 +6,7 @@ import (
 )
 
 func openDB() *bolt.DB {
-	db, err := bolt.Open("state.db", 0600, nil)
+	db, err := bolt.Open("faucet.db", 0600, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
