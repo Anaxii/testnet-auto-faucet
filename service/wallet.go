@@ -33,25 +33,20 @@ func (s *FaucetService) Balance(walletAddress string) *big.Int {
 	return balance
 }
 
-func (s *FaucetService) Send(walletAddress string) {
+func (s *FaucetService) Send(walletAddress string) error {
 	client, err := ethclient.Dial(s.Subnet.RpcURL)
 	if err != nil {
-		log.Println("wallet/wallet.go:Balance(): Failed to connect to the Ethereum client:", err)
-		log.WithFields(log.Fields{
-			"network":   s.Subnet.Name,
-			"err": err,
-		}).Error("wallet/wallet.go:Balance(): Failed to connect to the Ethereum client:")
-		//return big.NewInt(0)
+		return err
 	}
 
 	nonce, err := client.PendingNonceAt(context.Background(), common.HexToAddress(s.PublicKey))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	toAddress := common.HexToAddress(walletAddress)
 	value := big.NewInt(1500000000000000000)
@@ -61,21 +56,21 @@ func (s *FaucetService) Send(walletAddress string) {
 
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), s.PrivateKey)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	err = client.SendTransaction(context.Background(), signedTx)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	fmt.Printf("tx sent: %s", signedTx.Hash().Hex())
 
-	return
+	return nil
 }
 

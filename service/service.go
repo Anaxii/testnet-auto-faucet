@@ -63,7 +63,13 @@ func (s *FaucetService) checkAccount(walletAddress string) {
 			log.WithFields(log.Fields{
 				"address": walletAddress,
 			}).Info("balance under threshold, preparing to send PFN")
-			s.Send(walletAddress)
+			err := s.Send(walletAddress)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"network":   s.Subnet.Name,
+					"err": err,
+				}).Error("Error sending funds")
+			}
 			db.Write([]byte("accounts"), []byte(walletAddress), []byte(fmt.Sprintf("%v", time.Now().Unix())))
 		} else {
 			//log.WithFields(log.Fields{
