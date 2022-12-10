@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"math/big"
 	"strconv"
+	"testnet-autofaucet/api"
 	db "testnet-autofaucet/embeddeddatabase"
 	"time"
 )
@@ -52,30 +53,31 @@ func (s *FaucetService) checkAccount(walletAddress string) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"status": "checkAccount",
-			"time":  string(lastTime),
+			"time":   string(lastTime),
 		}).Warn("Could not convert time to int")
 		db.Write([]byte("accounts"), []byte(walletAddress), []byte("0"))
 	}
 
-	if time.Since(time.Unix(int64(dbTime), 0)) > time.Hour * 24 {
-		bal := s.Balance(walletAddress)
-		if bal.Cmp(big.NewInt(1e18)) < 0 {
-			log.WithFields(log.Fields{
-				"address": walletAddress,
-			}).Info("balance under threshold, preparing to send PFN")
-			err := s.Send(walletAddress)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"network":   s.Subnet.Name,
-					"err": err,
-				}).Error("Error sending funds")
-			}
-			db.Write([]byte("accounts"), []byte(walletAddress), []byte(fmt.Sprintf("%v", time.Now().Unix())))
-		} else {
-			//log.WithFields(log.Fields{
-			//	"address": walletAddress,
-			//}).Info("balance over threshold")
-		}
+	if time.Since(time.Unix(int64(dbTime), 0)) <= time.Hour*24 {
+		return
 	}
+
+	if s.Balance(walletAddress).Cmp(big.NewInt(1e18)) >= 0 {
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"address": walletAddress,
+	}).Info("balance under threshold, preparing to send PFN")
+
+	if err = s.Send(walletAddress); err != nil {
+		log.WithFields(log.Fields{
+			"network": s.Subnet.Name,
+			"err":     err,
+		}).Error("Error sending funds")
+	}
+
+	api.Log(map[string]interface{}{"status": "topped off", "walletAddress": walletAddress})
+	db.Write([]byte("accounts"), []byte(walletAddress), []byte(fmt.Sprintf("%v", time.Now().Unix())))
 
 }

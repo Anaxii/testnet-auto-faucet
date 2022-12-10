@@ -6,6 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/sha3"
+	"math/rand"
 )
 
 func GenerateECDSAKey(pkey string) (string, *ecdsa.PrivateKey) {
@@ -25,4 +26,13 @@ func GenerateECDSAKey(pkey string) (string, *ecdsa.PrivateKey) {
 	_privateKey := privateKey
 
 	return _publicKey, _privateKey
+}
+
+func RandStringRunes(n int) string {
+	letterRunes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }

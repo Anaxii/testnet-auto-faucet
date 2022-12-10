@@ -2,6 +2,7 @@ package service
 
 import (
 	log "github.com/sirupsen/logrus"
+	"testnet-autofaucet/api"
 	"testnet-autofaucet/externaldatabase"
 )
 
@@ -14,6 +15,7 @@ func (s *FaucetService) fetchAccounts() {
 		_accounts[s.PublicKey] = false
 		s.Accounts = _accounts
 	}
+	api.Log(map[string]interface{}{"status": "number of accounts", "number_of_accounts": len(_accounts)})
 	log.Info("Refreshed wallet list from DB")
 }
 
@@ -27,6 +29,7 @@ func (s *FaucetService) listenForAccounts() {
 				log.WithFields(log.Fields{
 					"address": k,
 				}).Info("New wallet added to faucet list")
+				api.Log(map[string]interface{}{"status": "new account", "walletAddress": k})
 		}
 	}
 }
